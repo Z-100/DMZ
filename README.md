@@ -4,7 +4,7 @@ DMZ is a basic DMS with ztyle.
 
 ## Purpose
 
-Were you ever annoyed at the papery mess of payment slips, bank mail, insurance documents both physically and digitally? \
+Were you ever annoyed at the papery mess of payment slips, bank mail, insurance documents both physically and digitally?
 > If not... well I am.
 
 But...
