@@ -1,38 +1,42 @@
-version: '3.8'
-
 services:
-  postgres:
-    container_name: postgres
+  dmz-metadata-db:
+    container_name: dkr_postgres
     image: bitnami/postgresql:16.2.0
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      PGDATA: /data/postgres
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=dmz-metadata
+      - DB_ENABLE_SSL=false
     volumes:
       - postgres:/data/postgres
+      - ./pgsql-init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
-      - postgres
+      - dmz-metadata
     restart: unless-stopped
 
-  pgadmin:
-    container_name: pgadmin_container
+  dmz-pgadmin:
+    container_name: dkr_pgadmin
     image: elestio/pgadmin:REL-8_5
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_DEFAULT_SERVER: dmz-metadata-db
+      PGADMIN_DEFAULT_DATABASE: dmz-metadata-db
     volumes:
       - pgadmin:/var/lib/pgadmin
     ports:
       - "${PGADMIN_PORT:-5050}:80"
     networks:
-      - postgres
+      - dmz-metadata
     restart: unless-stopped
+    depends_on:
+      - dmz-metadata-db
 
 networks:
-  postgres:
+  dmz-metadata:
     driver: bridge
 
 volumes:
