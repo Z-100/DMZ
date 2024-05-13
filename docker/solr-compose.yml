@@ -1,38 +1,39 @@
 version: '3.8'
 
 services:
-  solr1:
+
+  dmz_solr:
+    container_name: dkr_solr
     image: bitnami/solr:9.5.0
-    container_name: solr1
-    ports:
-      - "8983:8983"
     environment:
       - ZK_HOST=zoo:2181
     networks:
-      - solr
+      - dmz_solr_net
+    volumes:
+      - dmz_solr_vol:/data/solr
+    ports:
+      - "8983:8983"
     depends_on:
       - zoo
-    volumes:
-      - solr_docs:/data/solr
 
-  zoo:
+  dmz_zookeeper:
+    container_name: dkr_zookeeper
     image: bitnami/zookeeper:3.9.2
-    container_name: zoo
     restart: always
-    hostname: zoo
+    hostname: zookeeper
     ports:
       - "2181:2181"
       - "7000:7000"
     environment:
       ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=zoo1:2888:3888
+      ZOO_SERVERS: server.1=zookeeper:2888:3888
       ZOO_4LW_COMMANDS_WHITELIST: mntr, conf, ruok
       ZOO_CFG_EXTRA: "metricsProvider.className=org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider metricsProvider.httpPort=7000 metricsProvider.exportJvmInfo=true"
     networks:
-      - solr
+      - dmz_solr_net
 
 networks:
-  solr:
+  dmz_solr_net:
 
 volumes:
-  solr_docs:
+  dmz_solr_vol:

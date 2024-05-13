@@ -1,44 +1,45 @@
 services:
-  dmz-metadata-db:
+
+  dmz_pgsql:
     container_name: dkr_postgres
     image: bitnami/postgresql:16.2.0
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_DB=dmz-metadata
+      - POSTGRES_DB=dmz-pgsql
       - DB_ENABLE_SSL=false
     volumes:
-      - postgres:/data/postgres
+      - dmz_pgsql_vol:/data/postgres
       - ./pgsql-init-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
-      - dmz-metadata
+      - dmz_metadata_net
     restart: unless-stopped
 
-  dmz-pgadmin:
+  dmz_pgadmin:
     container_name: dkr_pgadmin
     image: elestio/pgadmin:REL-8_5
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
-      PGADMIN_DEFAULT_SERVER: dmz-metadata-db
-      PGADMIN_DEFAULT_DATABASE: dmz-metadata-db
+      PGADMIN_DEFAULT_SERVER: dmz-pgsql
+      PGADMIN_DEFAULT_DATABASE: dmz-pgsql
     volumes:
-      - pgadmin:/var/lib/pgadmin
+      - dmz_pgadmin_vol:/var/lib/pgadmin
     ports:
       - "${PGADMIN_PORT:-5050}:80"
     networks:
-      - dmz-metadata
+      - dmz_metadata_net
     restart: unless-stopped
     depends_on:
-      - dmz-metadata-db
+      - dmz_pgsql
 
 networks:
-  dmz-metadata:
+  dmz_metadata_net:
     driver: bridge
 
 volumes:
-  postgres:
-  pgadmin:
+  dmz_pgsql_vol:
+  dmz_pgadmin_vol:

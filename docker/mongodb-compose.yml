@@ -1,0 +1,15 @@
+services:
+
+  dmz-mongodb:
+    container_name: dkr_mongodb
+    image: bitnami/mongodb:7.0.9
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - 27017:27017
+    volumes:
+      - dmz_mongodb_vol:/data/mongodb
+
+volumes:
+  dmz_mongodb_vol
